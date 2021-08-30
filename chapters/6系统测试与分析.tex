@@ -30,7 +30,7 @@
     \note{压测计划2}
 \end{figure}
 
-功能测试部分，通过自动化的接口测试，来保证每一次迭代上线的质量。沿用Go SDK自带的Test包，将所有发布的接口分别编写Test函数，再编写一个统一的测试
+功能测试部分，通过自动化的接口测试，来保证每一次迭代上线的质量\cite{zw3}。沿用Go SDK自带的Test包，将所有发布的接口分别编写Test函数，再编写一个统一的测试
 入口函数TestAll，该函数主要完成如下任务：
 \begin{enumerate}
     \item 初始化构建测试数据库
@@ -42,7 +42,7 @@
 测试数据库选用sqlite3，初始化使用migration-go, 进行数据库创建，使用go-xorm进行数据库操作(与业务DAO层保持一致)。测试用例使用JSON格式描述，
 需要包含接口的输入参数，接口的预期输出。由于用例是JSON，因此断言部分主要使用jsonassert结合govaluate第三方包完成。
 
-压力测试部分， 通过在搭建的微服务集群中创建一个容器，用于执行压力测试。
+压力测试部分， 通过在搭建的微服务集群中创建一个容器，用于执行压力测试\cite{zw4}。
 
 
 \section{功能性测试}
@@ -587,7 +587,7 @@ ZRANGE ES\_\{Machine\_Qrn\} -inf +inf
 
 新建shell脚本，用于执行命令 ./go-stress-testing-amd -c $cur_con -n $req\_num -p \$curl\_file
 
-在容器控制台执行sh press\_test.sh 100 100000 curl/stress-test-1.sh
+在容器控制台执行sh press\_test.sh 100 100000 curl/stress-test-1.sh\cite{zw5}
 
 参数\$1, \$2, \$3含义是设置并发协程数为100，请求量为100000，执行curl/stress-test-1.sh脚本里的curl请求语句（需提前写好TODO）。
 
