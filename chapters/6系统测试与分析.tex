@@ -527,20 +527,54 @@ POST /v1/auth/DescribeToken
 \subsection{预测执行}
 
 预测器服务
-POST /v1/predict/Predict
-POST /v1/predict/ExecutionRecord
 
-\subsection{动态负载探活}
-POST /v1/processor/Healthy
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{p1.png}
+    \caption{构建DAG}
+    \label{fig:6-3-2}
+\end{figure}
 
-\subsection{内存管理优化}
-压测，火焰图？
-
-\subsubsection{服务降级、熔断策略}
+如上图所示，构建一个测试用的执行节点DAG图，测试预测执行模式和顺序执行模式下执行的性能。该DAG图定义了2个任务，第一个是sum函数，第二个
+是将计算结果重定向到用户标准输出。
 
 
-\subsection{自动化测试能力建设}
-go test TestALl.go
+POST /v1/predict/ProcessPredict
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{p2.png}
+    \caption{预测执行器执行结果}
+    \label{fig:6-3-3}
+\end{figure}
+
+如上图所示，预测执行任务模式，节点1，节点2合并执行，因为是并行执行，所以时间消耗只取决于节点中最消耗时间的节点，在该例子中
+是节点2，消耗2s，共计消耗2s。
+
+POST /v1/flow/Process
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{p3.png}
+    \caption{执行器执行结果}
+    \label{fig:6-3-3}
+\end{figure}
+
+如上图所示，顺序执行任务模式，节点1消耗1.5s, 任务节点2消耗2s，共计3.5s
+
+%POST /v1/predict/ExecutionRecord
+
+
+%\subsection{动态负载探活}
+%POST /v1/processor/Healthy
+
+%\subsection{内存管理优化}
+%压测，火焰图
+
+%\subsubsection{服务降级、熔断策略}
+
+%\subsection{自动化测试能力建设}
+%go test TestAll.go
 
 
 \subsection{日志巡检}
