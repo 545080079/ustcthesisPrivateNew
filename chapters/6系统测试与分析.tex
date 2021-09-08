@@ -50,7 +50,11 @@
 
 \subsection{工作流管理}
 
-涉及的接口：
+项目搭建了使用Json断言能力的自动化测试框架，采用JSON文件定义测试用例，每一个x.request.json和x.response.json作为一组，定义序号为x
+的测试用例的输入和输出。定义\@开头代表断言能力起始符，主要断言语句有\@exists()：是否存在该字段，\@isEmpty()：该字段是否为空字符串，
+\@notEmpty()：该字段是否为非空字符串，\@notExists：该字段应为不存在，\@len()：该字段的长度必须满足后续给定的不等式。
+
+涉及的接口以及其测试用例如下：
 
 POST /v1/template/CreateTemplate
 
@@ -80,6 +84,7 @@ POST /v1/template/CreateTemplate
 
 \}
 
+用例解释：该用例为CreateTemplate借口的第一个测试用例，接口返回应包含TemplateId字段，否则断言不成立。后续用例皆同理。
 
 POST /v1/template/ModifyTemplate
 
@@ -625,8 +630,7 @@ ZRANGE ES\_\{Machine\_Qrn\} -inf +inf
 
 参数\$1, \$2, \$3含义是设置并发协程数为100，请求量为100000，执行curl/stress-test-1.sh脚本里的curl请求语句（需提前写好TODO）。
 
-对StartExecution、SubmitCmd两个接口分别进行压力测试。前者对全链路涉及的服务都会覆盖，反应整个流程的性能好坏；后者仅是链路中的关键步骤，反应
-了容器执行的速度性能。
+对SubmitCmd接口进行业务流程的压力测试。以期调用全链路涉及的服务，目的是获取整个流程的性能开销情况。
 
 
 对SubmitCmd接口压测，并发数:120 请求数:20000000
@@ -647,12 +651,12 @@ POST /v1/processor/SubmitCmd
     \label{fig:6-3-2}
     \note{监控状态}
 \end{figure}
-
-对StartExecution接口的Normal模式压测，并发数:120 请求数:20000000
-POST /v1/scheduler/StartExecution
-
-对StartExecution接口的Parallel模式压测，并发数:120 请求数:20000000
-POST /v1/scheduler/StartExecution
+%
+%对StartExecution接口的Normal模式压测，并发数:120 请求数:20000000
+%POST /v1/scheduler/StartExecution
+%
+%对StartExecution接口的Parallel模式压测，并发数:120 请求数:20000000
+%POST /v1/scheduler/StartExecution
 
 
 \section{本章小结}
