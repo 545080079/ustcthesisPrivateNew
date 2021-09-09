@@ -14,20 +14,12 @@
 
 \subsection{测试工具和方法}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{press-test-1.png}
-    \caption{6-3-1}
-    \label{fig:6-1-1}
-    \note{压测计划1}
-\end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{press-test-2.png}
-    \caption{6-3-1}
+    \caption{压测计划}
     \label{fig:6-1-2}
-    \note{压测计划2}
 \end{figure}
 
 功能测试部分，通过自动化的接口测试，来保证每一次迭代上线的质量\cite{zw3}。沿用Go SDK自带的Test包，将所有发布的接口分别编写Test函数，再编写一个统一的测试
@@ -56,7 +48,9 @@
 
 涉及的接口以及其测试用例如下：
 
+创建模板：
 POST /v1/template/CreateTemplate
+
 
 1.request.json:
 
@@ -84,8 +78,10 @@ POST /v1/template/CreateTemplate
 
 \}
 
+
 用例解释：该用例为CreateTemplate借口的第一个测试用例，接口返回应包含TemplateId字段，否则断言不成立。后续用例皆同理。
 
+修改模板：
 POST /v1/template/ModifyTemplate
 
 1.request.json:
@@ -116,6 +112,7 @@ POST /v1/template/ModifyTemplate
 
 \}
 
+删除模板：
 POST /v1/template/DeleteTemplate
 
 1.request.json:
@@ -136,7 +133,7 @@ POST /v1/template/DeleteTemplate
 
 \}
 
-
+创建工作流：
 POST /v1/template/CreateFlowService
 
 1.request.json:
@@ -153,7 +150,7 @@ POST /v1/template/CreateFlowService
 
 "Type"                   : "EXPRESS",
 
-"RoleResource"           : "qrn:qcs:asw:ap-guangzhou:1301845006:http:json:flowmachine:test\_one:xqb4fdd1",
+"RoleResource"           : "qrn:qcs:asw:ap-guangzhou:45006:json:flow:test:xqb4f",
 
 "Description"            : "description string",
 
@@ -174,12 +171,12 @@ POST /v1/template/CreateFlowService
 \}
 
 
-
+修改工作流：
 POST /v1/template/ModifyFlowService
 
 1.request.json:\{
 
-    "FlowServiceResource"   : "qrn:qcs:asw:ap-guangzhou:1259772248:http:json:flowmachine:zzz:c139dqb7",
+    "FlowServiceResource"   : "qrn:qcs:asw:ap-guangzhou:72248:json:flow:c139d",
 
 %"Definition"            : "{\"Comment\":\"使用Pass节点演示hello world示例\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Comment\":\"传递\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Comment\":\"传递\",\"End\":true}}}",
 
@@ -209,6 +206,7 @@ POST /v1/template/ModifyFlowService
 
 \}
 
+删除工作流：
 POST /v1/template/DeleteFlowService
 
 1.request.json:
@@ -232,6 +230,7 @@ POST /v1/template/DeleteFlowService
 
 
 \subsection{工作流执行}
+开始执行：
 POST /v1/scheduler/StartExecution
 
 Parallel模式、Normal模式
@@ -256,7 +255,7 @@ Parallel模式、Normal模式
 \}
 
 
-
+获取任务状态：
 GET /v1/processor/GetTaskStatus
 
 1.request.json:
@@ -278,6 +277,7 @@ GET /v1/processor/GetTaskStatus
 
 \}
 
+提交任务：
 POST /v1/processor/SubmitCmd
 
 1.request.json:
@@ -293,6 +293,7 @@ POST /v1/processor/SubmitCmd
 \}
 
 \subsection{查询工作流列表}
+获取模板列表
 GET /v1/template/DescribeTemplates
 
 1.request.json:
@@ -324,6 +325,7 @@ GET /v1/template/DescribeTemplates
 
 \}
 
+获取工作流列表：
 GET /v1/template/DescribeFlowServices
 
 1.request.json:
@@ -355,100 +357,165 @@ GET /v1/template/DescribeFlowServices
 \}
 
 \subsection{查询工作流详情}
+获取工作流详情：
 GET /v1/template/DescribeFlowServiceDetail
 
 
 1.request.json:
+
 \{
-"FlowServiceResource": "qrn:qcs:asw:ap-guangzhou:1259772248:http:json:flowmachine:zzz:c139dqb7"
+
+"FlowServiceResource": "qrn:qcs:asw:ap-guangzhou:12597:json:flow:c139d"
+
 \}
+
 1.response.json：
+
 \{
+
 "FlowServiceName"        :  "\@notEmpty()",
+
 "Status"                 :  "\@notEmpty()",
+
 "Definition"             :  "\@notEmpty()",
+
 "RoleResource"           :  "\@notEmpty()",
+
 "Type"                   :  "\@notEmpty()",
+
 "CreateDate"             :  "\@notEmpty()",
+
 "Description"            :  "\@notEmpty()",
+
 "FlowServiceChineseName" :  "\@exists()"
+
 \}
 
 \subsection{工作流应用模板部署}
+
+获取模板资源：
 GET /v1/template/DescribeTemplateResources
+
 1.request.json:
+
 \{
+
 "TemplateId": "tpl-c59aj3jz"
-\}
-1.response.json:
-\{
-"Resources": "\@exists()"
+
 \}
 
+1.response.json:
+
+\{
+
+"Resources": "\@exists()"
+
+\}
+
+获取部署结果：
 GET /v1/template/DescribeDeployResults
 
 1.request.json:
+
 \{
+
 "TemplateId": "tpl-c59aj3jz",
-"ExecutionQRN": "qrn:qcs:asw:ap-guangzhou:1300746878:execution:bu5op4dq:bu5uui21bu5uui22-bu5uui23-bu5uui24-bu5uui25"
+
+"ExecutionQRN": "qrn:qcs:asw:ap-guangzhou:1300746878:execution:bu5op4dq:"
+
 \}
 
 1.response.json：
-\{
-"DeployResults": "\@exists()",
-"MachineQrn": "\@len()\>30"
-\}
 
-POST /v1/scheduler/StartDeploy
+\{
+
+"DeployResults": "\@exists()",
+
+"MachineQrn": "\@len()\>30"
+
+\}
 
 \subsection{工作流应用模板查询}
-
+获取应用模板列表
 GET /v1/template/DescribeApplicationTemplates
+
 1.request.json:
+
 \{
+
 \}
 
 1.response.json：
+
 \{
+
 "Templates": "\@exists()"
+
 \}
 
 \subsection{权限管理}
-
+创建用户授权信息
 POST /v1/auth/CreateUserStatus
+
 1.request.json:
+
 \{
+
 "uid": "123456"
+
 \}
 
 1.response.json:
+
 \{
+
 \}
+
+获取用户状态
 GET /v1/auth/DescribeUserStatus
+
 1.request.json:
+
 \{
+
 \}
 
 1.response.json:
+
 \{
+
 "IsNewUser": "\@exists()"
+
 "GrantUrl": "\@exists()"
+
 "LogFlagBit": "\@exists()"
+
 \}
 
 POST /v1/auth/DescribeToken
+
 1.request.json:
+
 \{
+
 "RoleQRN": "\@notEmpty()"
+
 "Region": "\@notEmpty()"
+
 \}
 
 1.response.json：
+
 \{
+
 "SecretId: "\@notEmpty()"
+
 "SecretKey: "\@notEmpty()"
+
 "Token: "\@exists()"
+
 "ExpiredTime: "\@exists()"
+
 \}
 
 %测试用例设计：
@@ -516,18 +583,6 @@ POST /v1/auth/DescribeToken
 
 根据需求分析的非功能性功能部分，需要测试的部分如下：
 
-\subsection{服务合并}
-111
-%curl localhost:59901 -d '{"Action":"DescribeComponentTree"}'
-%
-%curl localhost:59901 -d '{"Action":"DescribeComponents"}'
-%
-%curl localhost:59901 -d '{"Action":"CreateFlowServiceComponent", "Region": "ap-guangzhou", "uin": "100011023428", "subAccountUin":"100011023428", "appid": 1259772248, "FlowServiceId": "asr-checkAsrJob", "ReturnCode": "200", "ServiceName": "test123", "ChineseName": "测试", "Name": "test123"}'
-%
-%curl localhost:59901 -d '{"Action":"GetComponentDetail", "ComponentResource": "qrn:qcs:asw:ap-guangzhou:1259772248:http:json:flowmachine:test123:test123"}'
-%
-%curl localhost:59901 -d '{"Action": "DeleteFlowServiceComponent", "Region": "ap-guangzhou", "uin": "100011023428", "subAccountUin":"100011023428", "appid": 1259772248, "ComponentResource": "qrn:qcs:asw:ap-guangzhou:1259772248:http:json:flowmachine:test123:test123"}'
-%
 
 \subsection{预测执行}
 
@@ -560,7 +615,7 @@ POST /v1/flow/Process
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{p3.png}
+    \includegraphics[width=1.0\textwidth]{p3.png}
     \caption{执行器执行结果}
     \label{fig:6-3-3}
 \end{figure}
@@ -585,30 +640,28 @@ POST /v1/flow/Process
 \subsection{日志巡检}
 
 参数：threshold，超过该值的日志不进行重复输出。不填默认为10
+
 python3 search\_error.py 10
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{log-1.png}
+    \includegraphics[width=0.8\textwidth]{log-1.png}
     \caption{巡检1}
     \label{fig:6-4-1}
-    \note{巡检1}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{log-2.png}
+    \includegraphics[width=0.8\textwidth]{log-2.png}
     \caption{巡检2}
     \label{fig:6-4-2}
-    \note{巡检2}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1.5\textwidth]{log-3.png}
+    \includegraphics[width=1.3\textwidth]{log-3.png}
     \caption{巡检3}
     \label{fig:6-4-3}
-    \note{巡检3}
 \end{figure}
 
 \subsection{缓存淘汰策略}
@@ -620,17 +673,13 @@ ZRANGE ES\_\{Machine\_Qrn\} -inf +inf
 
 \section{压力测试}
 
-
-使用https://github.com/link1st/go-stress-testing开源项目作为压力测试工具。该项目是一个go 实现的压测工具，每个用户用一个协程的方
+\begin{itemize}
+    \item 使用https://github.com/link1st/go-stress-testing开源项目作为压力测试工具。该项目是一个go 实现的压测工具，每个用户用一个协程的方
 式模拟，最大限度的利用 CPU 资源。go-stress-testing-amd -c 1 -n 100 -u localhost:8000
-
-新建shell脚本，用于执行命令 ./go-stress-testing-amd -c $cur_con -n $req\_num -p \$curl\_file
-
-在容器控制台执行sh press\_test.sh 100 100000 curl/stress-test-1.sh\cite{zw5}
-
-参数\$1, \$2, \$3含义是设置并发协程数为100，请求量为100000，执行curl/stress-test-1.sh脚本里的curl请求语句（需提前写好TODO）。
-
-对SubmitCmd接口进行业务流程的压力测试。以期调用全链路涉及的服务，目的是获取整个流程的性能开销情况。
+    \item 新建shell脚本，用于执行命令 ./go-stress-testing-amd -c $cur_con -n $req\_num -p \$curl\_file
+    \item 在容器控制台执行sh press\_test.sh 100 100000 curl/stress-test-1.sh\cite{zw5}
+    \item 参数\$1, \$2, \$3含义是设置并发协程数为100，请求量为100000，执行curl/stress-test-1.sh脚本里的curl请求语句（需提前写好TODO）。
+    \item 对SubmitCmd接口进行业务流程的压力测试。以期调用全链路涉及的服务，目的是获取整个流程的性能开销情况。
 
 
 对SubmitCmd接口压测，并发数:120 请求数:20000000
@@ -646,11 +695,12 @@ POST /v1/processor/SubmitCmd
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{6-3-2.jpg}
+    \includegraphics[width=1.1\textwidth]{6-3-2.jpg}
     \caption{6-3-2}
     \label{fig:6-3-2}
     \note{监控状态}
 \end{figure}
+
 %
 %对StartExecution接口的Normal模式压测，并发数:120 请求数:20000000
 %POST /v1/scheduler/StartExecution

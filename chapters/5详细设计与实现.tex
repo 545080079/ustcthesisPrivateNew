@@ -38,7 +38,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{class-template.png}
+    \includegraphics[width=1.2\textwidth]{class-template.png}
     \caption{模板服务类图}
     \label{fig:模板服务类图}
 \end{figure}
@@ -63,21 +63,18 @@
         字段 & 类型 & 描述 \\
         \midrule
         TemplateId & string & 模板ID \\
-        TemplateId &          string& \\
-        TemplateName &        string& \\
-        Description   &       string& \\
-        TemplateCategory  &   string& \\
-        TemplateType     &    string& \\
-        TemplateStatus    &   string& \\
-        CreateDate        &   string& \\
-        ModifyDate        &   string& \\
-        Creator           &   string& \\
-        Modifier          &   string& \\
-        Definition        &   string& \\
-        ComponentSet      &   []string& \\
-        Version           &   int32& \\
-        Online            &   string& \\
-        Config            &   string& \\
+        TemplateName &        string& 模板名称\\
+        Description   &       string& 描述\\
+        TemplateType     &    string& 模板类别\\
+        TemplateStatus    &   string& 模板状态\\
+        CreateDate        &   string& 创建时间\\
+        ModifyDate        &   string& 修改时间\\
+        Creator           &   string& 创建者ID\\
+        Modifier          &   string& 修改者ID\\
+        Definition        &   string& TCSL定义\\
+        Version           &   int32& 模板版本\\
+        Online            &   string& 是否发布\\
+        Config            &   string& 模板配置\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -92,17 +89,15 @@
         字段 & 类型 & 描述 \\
         \midrule
         FlowId &       string & 工作流ID \\
-        FlowName &       string & \\
-        Status &                string & \\
-        Definition &            string & \\
-        RoleResource &          string & \\
-        Type &                  string & \\
-        CreateDate &            string & \\
-        Description &           string & \\
-        FlowServiceChineseName & string & \\
-        EnableCLS &             bool & \\
-        CLSUrl &                string & \\
-        FlowInput &             string & \\
+        FlowName &       string & 工作流名称\\
+        Status &                string & 工作流状态\\
+        Definition &            string & TCSL定义\\
+        Type &                  string & 工作流类型\\
+        CreateDate &            string & 创建时间\\
+        Description &           string & 描述\\
+        FlowServiceChineseName & string & 工作流中文名\\
+        SwitchBit &             tinyint & 日志写入标志位\\
+        FlowInput &             string & 工作流默认输入（仅应用模板使用）\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -123,7 +118,6 @@ CreateTemplate
         rsp & TemplateId & string & 创建时生成的模板ID\\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 ModifyTemplate
@@ -139,7 +133,6 @@ ModifyTemplate
         rsp & & & \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 DeleteTemplate
@@ -156,7 +149,6 @@ DeleteTemplate
         rsp & & & \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 CreateFlowService
@@ -173,7 +165,6 @@ CreateFlowService
         & CreateTime & time.Time & 工作流创建时间 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 ModifyFlowService
@@ -190,7 +181,6 @@ ModifyFlowService
         & UpdateTime & time.Time & 更新时间 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 
@@ -209,7 +199,6 @@ DeleteFlowService
         & DeleteTime & time.Time & 删除时间 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 DescribeFlowServices
 \begin{table}[H]
@@ -225,7 +214,6 @@ DescribeFlowServices
         & TotalCount & int32 & 查询到的工作流数量 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 DescribeFlowServiceDetail
@@ -241,7 +229,6 @@ DescribeFlowServiceDetail
         rsp & Flow & Flow & 查询到的工作流 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 
@@ -259,7 +246,6 @@ DescribeTemplates：调用该接口以获取指定的模板。
         & TotalCount & int32 & 查询到的模板数量 \\
         \bottomrule
     \end{tabular}
-    \note{注：模板表的}
 \end{table}
 
 
@@ -288,7 +274,6 @@ DescribeApplicationTemplates：调用该接口以获取所有应用模板，通�
 
         \bottomrule
     \end{tabular}
-    \note{注：模板表的}
 \end{table}
 
 
@@ -611,7 +596,6 @@ SecretId、SecretKey，其余字段为空。
         容量扩展性 & 不可用 & 中等 & 优秀\\
         \bottomrule
     \end{tabular}
-    \note{注：表}
 \end{table}
 
 接口设计：
@@ -773,21 +757,20 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
     \label{tab:t_flow_template}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null&默认值	&描述 \\
         \midrule
-        f\_id	&int	&11 &&&& \\
-        f\_template\_id	&varchar	&20 &&&& \\
-        f\_service\_id	&varchar	&20 &&&& \\
-        f\_category	&varchar	&12 &&&& \\
-        f\_status	&varchar	&64 &&&& \\
-        f\_create\_time	&timestamp & &&&& \\
-        f\_modify\_time   &timestamp & &&&& \\
-        f\_creator	&varchar	&64 &&&& \\
-        f\_modifier	&varchar	&64 &&&& \\
-        f\_app\_id	&int	&18 &&&& \\
+        f\_id	&int	&11 &否&&主键ID \\
+        f\_template\_id	&varchar	&20 &否&&模板ID \\
+        f\_service\_id	&varchar	&20 &否&&工作流ID \\
+        f\_category	&varchar	&12 &否&&模板类型 \\
+        f\_status	&varchar	&64 &否&&模板状态 \\
+        f\_create\_time	&timestamp & &否&&创建时间 \\
+        f\_modify\_time   &timestamp & &否&&最近修改时间 \\
+        f\_creator	&varchar	&64 &否&&创建者ID \\
+        f\_modifier	&varchar	&64 &否&&修改者ID \\
+        f\_app\_id	&int	&18 &否&& \\
         \bottomrule
     \end{tabular}
-    \note{注：1}
 \end{table}
 
 执行器表t\_processor：存储现有的资源机器，作为调度器进行资源编排和负载均衡的依据。
@@ -797,78 +780,72 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
     \label{tab:t_processor}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null &默认值	&描述 \\
         \midrule
-        f\_id	&int	&11 &&&& \\
-        f\_processor\_host	&varchar	&20 &&&& \\
-        f\_processor\_port	&varchar	&20 &&&& \\
-        f\_processor\_load	&int	&11 &&&& \\
-        f\_last\_hearbeat\_time	&datetime & &&&& \\
-        f\_status	&int	&11 &&&& \\
-        f\_registration\_time	&datetime & &&&& \\
-        f\_logout\_time	&datetime & &&&& \\
-        f\_logout\_reason	&int	&11 &&&& \\
+        f\_id	&int	&11 &否&& \\
+        f\_processor\_host	&varchar	&20 &否&& 执行器主机IP\\
+        f\_processor\_port	&varchar	&20 &否&& 执行器端口\\
+        f\_processor\_load	&int	&11 &否&& 执行器实时负载\\
+        f\_last\_hearbeat\_time	&datetime &&否&& 最后心跳响应时间\\
+        f\_status	&int	&11 &否&& 执行器节点状态\\
+        f\_registration\_time	&datetime &&否&& 注册时间\\
+        f\_logout\_time	&datetime &&否&& 失去响应时间\\
+        f\_logout\_reason	&int	&11 &否&& 失去响应原因\\
         \bottomrule
     \end{tabular}
-    \note{注：1}
 \end{table}
 
 工作流服务表t\_flow\_service：以服务对象作为单位，将该对象称作工作流，表设计应将服务id、模板id存储为一条记录，互相关联。
 \begin{table}[H]
     \centering
-    \caption{工作流服务表}
+    \caption{工作流表}
     \label{tab:t_flow_service}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null&默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &&&& \\
-        f\_service\_id	&varchar	&64 &&&& \\
-        f\_machine\_qrn	&varchar	&128 &&&& \\
-        f\_role\_qrn	&varchar	&128 &&&& \\
-        f\_template\_id	&varchar	&64 &&&& \\
-        f\_switch\_bit	&tinyint	&4 &&&& \\
-        f\_service\_name	&varchar	&64 &&&& \\
-        f\_machine\_type	&varchar	&64 &&&& \\
-        f\_category	&varchar	&12 &&&& \\
-        f\_status	&varchar	&64 &&&& \\
-        f\_create\_time	&timestamp & &&&& \\
-        f\_modify\_time   &timestamp & &&&& \\
-        f\_creator	&varchar	&64 &&&& \\
-        f\_modifier	&varchar	&64 &&&& \\
-        f\_app\_id	&int	&18 &&&& \\
+        f\_id	&bigint	&20 &否& 主键ID\\
+        f\_service\_id	&varchar	&64 &否& 工作流ID\\
+        f\_machine\_qrn	&varchar	&128 &否& 工作流QRN\\
+        f\_role\_qrn	&varchar	&128 &否& 授权QRN\\
+        f\_template\_id	&varchar	&64 &否& 关联模板ID\\
+        f\_switch\_bit	&tinyint	&4 &否& 日志写入标志位\\
+        f\_service\_name	&varchar	&64 &否& 工作流名称\\
+        f\_machine\_type	&varchar	&64 &否& 工作流类型\\
+        f\_category	&varchar	&12 &否& 工作流类别\\
+        f\_status	&varchar	&64 &否& 工作流状态\\
+        f\_create\_time	&timestamp & &否& 创建时间\\
+        f\_modify\_time   &timestamp & &否& 最后一次修改时间\\
+        f\_creator	&varchar	&64 &否& 创建者ID\\
+        f\_modifier	&varchar	&64 &否& 修改者ID\\
         \bottomrule
     \end{tabular}
-    \note{注：表注分两种，第一种是对全表的注释，用不加阿拉伯数字排在表的下边，
-    前面加“注：”；第二种是和表内的某处文字或数字相呼应的注，
-    在表里面用带圈的阿拉伯数字在右上角标出，然后在表下面用同样的圈码注出来}
 \end{table}
 
 工作流调度记录表t\_execution：模拟操作系统调度任务操作，将每个任务抽象为一个整体，存储该任务的上下文信息，方便运行时存储任务状态，
 模拟TCB的各项数据存储，将其存储为一个表，为方便定位每一个当前任务，索引应设置任务ID。
 \begin{table}[H]
     \centering
-    \caption{执行器表}
+    \caption{执行日志表}
     \label{tab:t_execution}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null &默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &否 & & &主键 \\
-        f\_service\_id	&varchar	&64 &否 & & &工作流id \\
-        f\_machine\_qrn	&varchar	&128 &否 & & &物理机器QRN \\
-        f\_execution\_name	&varchar	&128 &否 & & &该次执行名称 \\
-        f\_execution\_qrn	&varchar	&128 &否 & & &该次执行QRN \\
-        f\_execution\_definition	&text	& &否 & & &工作流的模板TCSL定义 \\
-        f\_start\_time	&varchar	&20 &否 & & &执行开始时间 \\
-        f\_end\_time	&varchar	&20 &否 & & &执行结束时间 \\
-        f\_execution\_status	&varchar	&20 &否 & & &当前执行状态，枚举值Success, Failed, Running, Pause \\
-        f\_input	&text	& &否 & & &工作流的用户输入 \\
-        f\_output	&text	& &否 & & &工作流执行的输出 \\
-        f\_processor\_id	&int	&11 &否 & & &执行物理机器的id \\
+        f\_id	&bigint	&20 &否 & &主键 \\
+        f\_service\_id	&varchar	&64 &否 & &工作流id \\
+        f\_machine\_qrn	&varchar	&128 &否 & &物理机器QRN \\
+        f\_execution\_name	&varchar	&128 &否 & &该次执行名称 \\
+        f\_execution\_qrn	&varchar	&128 &否 & &该次执行QRN \\
+        f\_execution\_definition	&text	& &否 & &工作流的模板TCSL定义 \\
+        f\_start\_time	&varchar	&20 &否 & &执行开始时间 \\
+        f\_end\_time	&varchar	&20 &否 & &执行结束时间 \\
+        f\_execution\_status	&varchar	&20 &否 & &当前执行状态\\
+        f\_input	&text	& &否 & &工作流的用户输入 \\
+        f\_output	&text	& &否 & &工作流执行的输出 \\
+        f\_processor\_id	&int	&11 &否 & &执行物理机器的id \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 
@@ -879,22 +856,21 @@ template\_resource表t\_template\_execution：负责记录工作流应用模板�
     \label{tab:t_template_resource}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null&默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &否 &&& 主键id\\
-        f\_type	&varchar	&255 &否 &&& 资源类型\\
-        f\_template\_id	&varchar	&64 &否 &&& 模板id\\
-        f\_name	&varchar	&255 &否 &&& 应用模板名称\\
-        f\_description	&varchar	&255 &否 &&& 应用模板描述\\
-        f\_event\_node\_name	&varchar	&255 &否 &&& 在工作流中的节点名称\\
-        f\_service\_url	&varchar	&255 &否 &&& 外部服务的控制台地址\\
-        f\_describe\_status\_url	&varchar	&255 &否 &&& 查询外部服务的url\\
-        f\_status	&tinyint	&4 &否 &&& 可用状态，0， 1枚举值\\
-        f\_create\_time	&timestamp	& &否 &&CURRENT\_TIMESTAMP & 创建时间\\
-        f\_last\_update\_time	&timestamp	& &否 &&CURRENT\_TIMESTAMP & 最后一次更新时间\\
+        f\_id	&bigint	&20 &否 & 主键id\\
+        f\_type	&varchar	&255 &否 & 资源类型\\
+        f\_template\_id	&varchar	&64 &否 & 模板id\\
+        f\_name	&varchar	&255 &否 & 应用模板名称\\
+        f\_description	&varchar	&255 &否 & 应用模板描述\\
+        f\_event\_node\_name	&varchar	&255 &否 & 在工作流中的节点名称\\
+        f\_service\_url	&varchar	&255 &否 & 外部服务的控制台地址\\
+        f\_describe\_status\_url	&varchar	&255 &否 & 查询外部服务的url\\
+        f\_status	&tinyint	&4 &否 & 可用状态，0， 1枚举值\\
+        f\_create\_time	&timestamp	& &否 &NOW() & 创建时间\\
+        f\_last\_update\_time	&timestamp	& &否 &NOW() & 最后一次更新时间\\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 t\_user表t\_user：负责记录用户鉴权信息
@@ -904,20 +880,19 @@ t\_user表t\_user：负责记录用户鉴权信息
     \label{tab:t_user}
     \begin{tabular}{lllllll}
         \toprule
-        字段名	&类型	&长度	&可为Null	&键	&默认值	&描述 \\
+        字段名	&类型	&长度	&可为Null &默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &否 &&& 主键id\\
-        f\_uin	&varchar	&128 &否 &&& 用户uin\\
-        f\_app\_id	&varchar	&128 &否 &&& 用户appId\\
-        f\_status	&varchar	&20 &否 &&& 用户状态\\
-        f\_create\_time	&datetime	& &否 &&CURRENT\_TIMESTAMP  & 创建时间\\
-        f\_last\_login\_time	&datetime	& &否 &&CURRENT\_TIMESTAMP  & 最后一次登录时间\\
-        f\_cls\_logset\_id	&varchar	&255 &否 &&& 日志集id\\
-        f\_cls\_topic\_id	&varchar	&255 &否 &&& 日志主题id\\
-        f\_log\_bit	&tinyint	&4 &否 &&& 日志授权标志二进制位, 高位1：需要写入用户提供的日志集，低位1：需要写入系统提供的日志集\\
+        f\_id	&bigint	&20 &否 && 主键id\\
+        f\_uin	&varchar	&128 &否 && 用户uin\\
+        f\_app\_id	&varchar	&128 &否 && 用户appId\\
+        f\_status	&varchar	&20 &否 && 用户状态\\
+        f\_create\_time	&datetime	& &否 &NOW()  & 创建时间\\
+        f\_last\_login\_time	&datetime	& &否 &NOW()  & 最后一次登录时间\\
+        f\_cls\_logset\_id	&varchar	&255 &否 && 日志集id\\
+        f\_cls\_topic\_id	&varchar	&255 &否 && 日志主题id\\
+        f\_log\_bit	&tinyint	&4 &否 && 日志授权标志二进制位, 用户|系统日志集\\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 \subsection{表设计}
 
@@ -1011,7 +986,6 @@ HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
             & EndTime       & 终止时间，需要频繁更新的字段 &\\
             \bottomrule
         \end{tabular}
-        \note{注：}
     \end{table}
 
     \begin{table}[H]
@@ -1026,7 +1000,6 @@ HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
             (string) &&& \\
             \bottomrule
         \end{tabular}
-        \note{注：}
     \end{table}
 
 \subsection{查询合并}

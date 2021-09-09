@@ -38,7 +38,7 @@
     \note{}
 \end{figure}
 
-如图4.x，根据划分的微服务模型梳理的所有数据流转的对象主要有工作流、工作流模板、执行记录、执行器。由上述的对象构建一个系统的模型。
+如图4.2，根据划分的微服务模型梳理的所有数据流转的对象主要有工作流、工作流模板、执行记录、执行器。由上述的对象构建一个系统的模型。
 
 首先，工作流是系统主要的操作对象。需要区分地，由于工作流对象较为复杂，故将其抽象成两个部分，由工作流对象本身存储轻量的数据，再以外键的形式连接
 对应一个工作流模板对象，两者是一一对应的关系，这样一来，读取工作流对象时，不一定需要读取全量的数据，比如读取工作流状态时，不需要扫描那些数据量
@@ -87,7 +87,7 @@ CreateFlowService
     \note{}
 \end{figure}
 
-如上图3.x所示，工作流创建由CreateFlowService接口完成，涉及的服务主要是模板服务和鉴权服务。业务流程主要是先根据用户所设计的工作流，查询
+如上图4.3所示，工作流创建由CreateFlowService接口完成，涉及的服务主要是模板服务和鉴权服务。业务流程主要是先根据用户所设计的工作流，查询
 其使用的工作流在模板表里的信息，再根据查询到的结果进行实际工作流的创建。每一次工作流的创建，都必须以一个模板为基础，这个模板可以是用户
 自定义保存到数据库的，也可以是系统预设的简单示例模板，也可以是系统预设的具体业务场景的应用模板。
 
@@ -101,7 +101,7 @@ DescribeTemplate
     \note{}
 \end{figure}
 
-如上图3.x所示，工作流查询功能由DescribeTemplate对控制台提供，可以根据模板ID查询到用户对该模板是否拥有权限，如果有则返回该模板的信息。
+如上图4.4所示，工作流查询功能由DescribeTemplate对控制台提供，可以根据模板ID查询到用户对该模板是否拥有权限，如果有则返回该模板的信息。
 
 
 
@@ -127,7 +127,7 @@ DescribeDeployResults
     \caption{DescribeDeployResults时序图}
     \label{fig:DescribeDeployResults时序图}
 \end{figure}
-如上图3.x所示，应用模板的部署结果查询通过模板服务轮询DescribeDeployResults接口，直到全部返回结果都是确定状态（即成功或失败状态），或者
+如上图4.6所示，应用模板的部署结果查询通过模板服务轮询DescribeDeployResults接口，直到全部返回结果都是确定状态（即成功或失败状态），或者
 是查询次数到达上限，都会进行返回，通知用户此次部署的最终结果。
 
 \subsection{调度器微服务模块概要设计}
@@ -196,7 +196,7 @@ DescribeDeployResults
 \label{fig:kszx}
 \end{figure}
 
-如上图3.x所示，工作流开始执行功能是模板服务提供的主要功能之一。StartExecution接口负责提交执行任务到调度器。该接口业务逻辑复杂，
+如上图4.7所示，工作流开始执行功能是模板服务提供的主要功能之一。StartExecution接口负责提交执行任务到调度器。该接口业务逻辑复杂，
 涉及到了大部分的微服务模块。 外部模块通过StartExecution接口访问调度器服务，调度器负责协调数据层和执行器引擎服务。根据执行方式的不同，有两种策略选择：
 
 \begin{enumerate}
@@ -250,7 +250,6 @@ DescribeDeployResults
         执行器 & 消费者消息投递，写入MySQL & N TPS \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 
@@ -293,7 +292,6 @@ DescribeDeployResults
         10000	&20002	&20000	&10000 \\
         \bottomrule
     \end{tabular}
-    \note{注：}
 \end{table}
 
 \begin{table}[H]
@@ -410,14 +408,6 @@ HTTP：一次HTTP请求
 \end{itemize}
 
 
-Healthy接口
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{3-4.jpg}
-    \caption{健康检查}
-    \label{fig:健康检查}
-    \note{3.x}
-\end{figure}
 
 \subsection{鉴权微服务模块概要设计}
 
@@ -445,7 +435,7 @@ DescribeUserStatus：cls投递日志权限检查
     \label{fig:预测器服务时序图}
 \end{figure}
 
-如上图3.x所示，预测器主要负责提供执行结果记录、历史执行记录查询。为执行器模块直接提供服务。\cite{le2021deep}
+如上图4.14所示，预测器主要负责提供执行结果记录、历史执行记录查询。为执行器模块直接提供服务。\cite{le2021deep}
 
 
 
