@@ -58,9 +58,9 @@
 
 \subsection{模板微服务模块概要设计}
 
-用户API层，提供对外服务的基础功能API，包括工作流的创建、修改、删除，DAG的编译与渲染显示等。如下图4-，将模板单独拆分为一个微服务的目
-的是为了尽量最小化调度执行器的功能，使得调用量大的StartExecution接口并发能力提高。因此抽象出“工作流”对象，该模块所包含的功能都是以
-这个抽象对象为基础的，由于普通用户对工作流进行的操作是低频的，因此该模块相对其它模块来说，是对性能要求更低的一个模块。
+用户API层，提供对外服务的基础功能API，包括工作流的创建、修改、删除，DAG的编译与渲染显示等。将模板单独拆分为一个微服务的目的是为了尽量最小化调度执
+行器的功能，使得调用量大的StartExecution接口并发能力提高。因此抽象出“工作流”对象，该模块所包含的功能都是以这个抽象对象为基础的，
+由于普通用户对工作流进行的操作是低频的，因此该模块相对其它模块来说，是对性能要求更低的一个模块。
 
 该服务直接提供对外的用户交互API，提供基于用户状态机列表、创建、更新、执行、删除等接口。由于原架构初始设计时未考虑到并发量大的场景，
 导致对数据库进行了频繁的查询操作，由此导致了接口的QPS不高。改进方案是将数据库操作优化，3个查询可以合并为一个join查询，减少查询次数，
@@ -107,14 +107,13 @@ DescribeTemplate
 
 应用模板功能
 StartDeploy
-这张图要替换为自己画的
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{app-template-sx-1.png}
+    \includegraphics[width=1.0\textwidth]{app-template-sx-1.png}
     \caption{StartDeploy时序图}
     \label{fig:StartDeploy时序图}
 \end{figure}
-如上图3.x所示，应用模板的主要功能就是根据系统预设的应用模板去为用户创建一个相应的工作流。StartDeploy接口负责完成这样一项工作，
+如上图4.5所示，应用模板的主要功能就是根据系统预设的应用模板去为用户创建一个相应的工作流。StartDeploy接口负责完成这样一项工作，
 调用DescribeApplicationTemplates接口获取该应用模板所需的所有资源的创建策略JSON文档，用此文档到鉴权服务处申请对应云资源的权限。
 资源创建完毕后，将执行命令提交到调度器，调度器会负责任务执行状态的管理，在成功执行后，会通知模板服务，此时通过DescribeDeployResults
 接口就可以获取到最终的部署结果，如果成功，进行页面自动跳转，引导用户进入新创建工作流的页面。
@@ -172,14 +171,14 @@ DescribeDeployResults
 
     这种触发性的工作流，它的启动是异步的。当执行的时候，带过来参数和要执行的状态机的qrn
     name是这一次执行的name，用户可以自己传，如果不自己传，则系统创建一个StateMachineQrn，形如
-    qrn:qcs:asw:sh:1300074211:http:json:flowmachine:flowservicetest:bcrlj428
+    qrn:qcs:asw:sh:1300074211:http:json:flowmachine:flowservicetest:bcrlj428。
     \item 异常流检查和处理
-    用于处理异常流程的是定时器healthyTimer，用于对容器实例的健康检查
+    用于处理异常流程的是定时器healthyTimer，用于对容器实例的健康检查。
     \item 启动执行
     整体过程如下：
     用户编辑完成一个状态机后，需要启动这个状态机
     通过 StartExection 接口进行启动调度器来选择相应的引擎来执行。引擎执行完成后，将数据写进kafka。调度器对kafka进行消费，
-    然后将数据写进 t\_execution\_event表
+    然后将数据写进 t\_execution\_event表。
     \item 开始部署应用模板(用于部署模板依赖的资源的模板)时, 和当前的状态机执行有些区别, 因此单独创建一个StartDeploy接口
     先获取应用资源模板(用来创建状态机依赖的资源的模板), 再组装请求(替换占位符内容, 拼接输入等)调用执行器开始部署。
     \item 停止执行
@@ -191,7 +190,7 @@ DescribeDeployResults
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.1\textwidth]{start-execution-1.png}
+\includegraphics[width=1.0\textwidth]{start-execution-1.png}
 \caption{开始执行}
 \label{fig:kszx}
 \end{figure}
@@ -200,8 +199,8 @@ DescribeDeployResults
 涉及到了大部分的微服务模块。 外部模块通过StartExecution接口访问调度器服务，调度器负责协调数据层和执行器引擎服务。根据执行方式的不同，有两种策略选择：
 
 \begin{enumerate}
-    \item 标准执行：不进行负载均衡，由执行器负责执行的流程
-    \item 快速执行：在之前注册上报的执行器信息和健康检查情况符合要求的表中查找执行器IP，通过负载情况计算出一个最合适的
+    \item 标准执行：不进行负载均衡，由执行器负责执行的流程。针对长时间运行、持久且可审计的工作流
+    \item 快速执行：在之前注册上报的执行器信息和健康检查情况符合要求的表中查找执行器IP，通过负载情况计算出一个最合适的。针对大批量的事件处理工作负载。
 \end{enumerate}
 
 
@@ -243,9 +242,9 @@ DescribeDeployResults
         \toprule
         所属模块    &操作详情   &资源用量预估 \\
         \midrule
-        消费者 & 日志写入MySQL的t\_execution\_event表 & N TPS \\
-        消费者 & 执行状态字段值更新 & 2 TPS（仅开始、停止）/ 0 TPS \\
-        消费者 & 获取服务开通状态, 查询t\_user表, HTTP请求写入日志 & N QPS + N QPS + N HTTP \\
+        消费者 & 日志写入MySQL的执行日志表 & N TPS \\
+        消费者 & 执行状态字段值更新 & 2 TPS / 0 TPS \\
+        消费者 & 获取服务开通状态, 写入日志 & N QPS + N QPS + N HTTP \\
         调度器 & 调用执行器SubmitCmd接口 & 1 HTTP \\
         执行器 & 消费者消息投递，写入MySQL & N TPS \\
         \bottomrule
@@ -263,10 +262,10 @@ DescribeDeployResults
         所属模块	&操作详情	&资源用量预估 \\
         \midrule
         调度器 & 日志写入Redis & N TPS \\
-        调度器 & 执行状态字段值更新 & 2 TPS（首尾节点）/ 0 TPS（中间节点） \\
-        调度器 & HTTP请求获取服务开通状态, 写入一条日志 & 2 * N HTTP \\
+        调度器 & 执行状态字段值更新 & 2 TPS / 0 TPS \\
+        调度器 & 获取服务开通状态, 写入日志 & 2 * N HTTP \\
         调度器 & 调用执行器SubmitCmd接口 & 1 HTTP \\
-        执行器 & 消费者消息投递，发送HTTP写入一条日志 & N HTTP \\
+        执行器 & 消息投递，写入日志 & N HTTP \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -308,19 +307,19 @@ DescribeDeployResults
         10000	&10002  &0	&30000 \\
         \bottomrule
     \end{tabular}
-    \note{注}
+    \note{
+        数据说明：
+        1：一次任务执行操作
+
+        N：任务包含节点个数
+
+        TPS：全称Transactions Per Second
+
+        QPS：全称Queries Per Second
+
+        HTTP：一次HTTP请求
+    }
 \end{table}
-
-数据说明：
-1：一次任务执行操作
-
-N：任务包含节点个数
-
-TPS：全称Transactions Per Second
-
-QPS：全称Queries Per Second
-
-HTTP：一次HTTP请求
 
 
 \subsubsection{方案选型分析}
@@ -342,7 +341,7 @@ HTTP：一次HTTP请求
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.1\textwidth]{3-2.jpg}
+    \includegraphics[width=0.9\textwidth]{3-2.jpg}
     \caption{普通执行器时序图}
     \label{fig:普通执行器时序图}
 \end{figure}
@@ -356,7 +355,7 @@ HTTP：一次HTTP请求
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.1\textwidth]{3-3.jpg}
+    \includegraphics[width=0.9\textwidth]{3-3.jpg}
     \caption{并行执行器时序图}
     \label{fig:并行执行器时序图}
 \end{figure}
@@ -375,38 +374,24 @@ HTTP：一次HTTP请求
 
 如图4.1，执行器模块主要有如下部件：
 \begin{itemize}
-    \item 语法解析模块
-    \item[+] JSON解析，构建DAG对象
-    \item[+] 语法检查
-    \item 运行时模块
-    \item[+] 配置管理
-    \item[+] 心跳上报
-    \item[+] 注册服务
-    \item 输入输出模块：提供对上下游数据流转的支持，提供接收、推送、转换数据的功能。
-    \item 并行调度模块
-    \item[+] 预测器：预测节点的输入输出，向并行执行器提出执行计划。设计思路借鉴指令重排序优化[13]，根据历史执行记录，预测节点输入，如果碰到分支节点，
+    \item 预测器：预测节点的输入输出，向并行执行器提出执行计划。设计思路借鉴指令重排序优化，根据历史执行记录，预测节点输入，如果碰到分支节点，
     则会预测最有可能执行的分支， 并向执行器申请资源完成执行，结果输出对其透明。该模块不负责保证预测结果的正确性，如果遇到预测失败，则会
     交由调度器负责从失败节点处开始转化为普通执行。
-    \item[+] 缓存器：辅助并行执行的部件，存储过程结果，不进行持久化。主要负责接收容器执行返回的结果，对没有及时返回结果的容器做阻塞处理，直到检测
+    \item 缓存器：辅助并行执行的部件，存储过程结果，不进行持久化。主要负责接收容器执行返回的结果，对没有及时返回结果的容器做阻塞处理，直到检测
     到容器销毁。存储的结果一定是已经执行完毕的。
-    \item[+] 并行执行器：由顺序执行器改进而来，区别是其需要和缓存器进行交互，根据缓存器提供的结果进行策略的选择。 主要功能与其相当，主要负责调度
+    \item 并行执行器：由顺序执行器改进而来，区别是其需要和缓存器进行交互，根据缓存器提供的结果进行策略的选择。 主要功能与其相当，主要负责调度
     任务节点，建立节点与容器的逻辑关系，维持和容器的连接，向每个正在执行任务的容器检测心跳信号，对一定时间没有回复信号的节点做宕机标记处
     理，并负责重发给另外的容器执行任务。
-    \item[+] 语法解析器：提供基于状态机的DAG解析功能，是执行器模块的上游部件。
-    \item[+] 运行时模块：容器环境配置管理、容器心跳管理、容器动态注册管理。
-    \item[+] 结果校验器：负责保证结果的正确性，对不符合预期的执行条目做打回处理。该校验器的校验逻辑是不断检查当前缓存的执行结果是否有后续节点的条
-    件不满足的情况发送，如果有，则代表包含此节点以后的所有执行都是不符合预期的，负责提出重新执行计划，回滚截止此节点之后的所有操作。[14]
+    \item 语法解析器：提供基于状态机的DAG解析功能，是执行器模块的上游部件。
+    \item 运行时模块：容器环境配置管理、容器心跳管理、容器动态注册管理。
+    \item 结果校验器：负责保证结果的正确性，对不符合预期的执行条目做打回处理。该校验器的校验逻辑是不断检查当前缓存的执行结果是否有后续节点的条
+    件不满足的情况发送，如果有，则代表包含此节点以后的所有执行都是不符合预期的，负责提出重新执行计划，回滚截止此节点之后的所有操作。
 
 \end{itemize}
 
-动态负载探活改造方案:
-\begin{itemize}
-    \item 在发送启动执行后, 执行器返回当前负载值. 动态更新processor信息
-    \item 定期探活获取负载值的逻辑依然保留
-    \item 调整定期探活间隔为1s
-    \item 进一步的, 可以根据负载程度动态配置探活间隔, 任务多的时候, 频繁探活, 任务少的时候, 降低探活频率
-\end{itemize}
-
+由于执行节点容易受到网络环境的影响，造成流量受阻或者完全不可用，因此需要实时监测执行节点容器的状态，执行器模块动态的负载状态检查职责如下：
+在发送启动执行后, 执行器需要实时返回当前负载值，根据更新的负载值，动态更新执行节点容器的信息；定期探活获取负载值；
+根据负载程度动态配置探活间隔, 任务多的时候, 频繁探活, 任务少的时候, 降低探活频率。
 
 
 \subsection{鉴权微服务模块概要设计}
@@ -416,11 +401,11 @@ HTTP：一次HTTP请求
 时效限制的Secret ID、Secret Key、Token，将这种行为成为“换票操作”。用于后续执行具体的业务流程的凭证，将该信息缓存于Redis，用户下次
 调用会先判断缓存是否存在，无需短时间重复进行换票。
 
-DescribeUserStatus：cls投递日志权限检查
+DescribeUserStatus：投递日志权限检查
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.2\textwidth]{cls-1.png}
+    \includegraphics[width=0.9\textwidth]{cls-1.png}
     \caption{日志投递权限检查}
     \label{fig:rztdqx}
 \end{figure}
@@ -485,27 +470,9 @@ DescribeUserStatus：cls投递日志权限检查
     \item 输出search\_log\_run\_log文件是该脚本运行时的日志
 \end{enumerate}
 
-相似度计算：
-%\begin{algorithm}[h]
-%    \SetAlgoLined
-%    \KwData{this text}
-%    \KwResult{how to write algorithm with \LaTeX2e }
-%
-%    initialization\;
-%    \While{not at end of this document}{
-%    read current\;
-%    \eIf{understand}{
-%    go to next section\;
-%    current section becomes this one\;
-%    }{
-%    go back to the beginning of current section\;
-%    }
-%    }
-%        \caption{算法示例1}
-%        \label{algo:algorithm1}
-%\end{algorithm}
+相似度计算代码如下。
 
-\begin{algorithm}[h]
+\begin{algorithm}[H]
     \SetAlgoLined
     \KwData{sm,sn,threshold}
     \KwResult{1 - matrix[m-1][n-1] / max(len(sm), len(sn))}
@@ -544,30 +511,43 @@ DescribeUserStatus：cls投递日志权限检查
 
 \end{algorithm}
 
+%\begin{algorithm}[h]
+%    \SetAlgoLined
+%    \KwData{this text}
+%    \KwResult{how to write algorithm with \LaTeX2e }
+%
+%    initialization\;
+%    \While{not at end of this document}{
+%    read current\;
+%    \eIf{understand}{
+%    go to next section\;
+%    current section becomes this one\;
+%    }{
+%    go back to the beginning of current section\;
+%    }
+%    }
+%        \caption{算法示例1}
+%        \label{algo:algorithm1}
+%\end{algorithm}
+
 \subsection{执行记录字典淘汰策略}
 ZSet数据结构以时间序列来淘汰数据的策略： 通过一个独立的协程，定时调用清理逻辑，保持Redis中数据的总量不超过特定值。
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{asw-1.png}
-    \caption{淘汰策略UML}
-    \label{fig:淘汰策略UML}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1.0\textwidth]{asw-1.png}
+%    \caption{淘汰策略UML}
+%    \label{fig:淘汰策略UML}
+%\end{figure}
 
 这里采用主流的淘汰策略LRU(Least Recently Used): 即最近最少使用，是一种常用的页面置换算法，选择最近最久未使用的页面予以淘汰。该算法
 赋予每个页面一个访问字段，用来记录一个页面自上次被访问以来所经历的时间t，当须淘汰一个页面时，选择现有页面中其t值最大的，即最近最少
 使用的页面予以淘汰\cite{landman2021selfoptimizing}。
 
 这也是Redis淘汰数据时采用的算法，但由于Redis不能按照时间序列来淘汰数据，仅支持设置指定日期Unix时间戳，设置内存占用大小阈值来淘汰，
-因此，需要采用其它的方式来实现。
+因此，需要采用其它的方式来实现，实现代码如下。
 
-代码
-// 需要按照分数删除, 如果按照rank进行删除, 在查询出来的这段时间内, 会同步insert新数据,
-// 导致实际del的数据和ListExecutions查出来的数据不一致, 最终引起泄漏.
-
-
-
-\begin{algorithm}[h]
+\begin{algorithm}[H]
     \SetAlgoLined
     \KwData{scores}
 
@@ -576,7 +556,6 @@ ZSet数据结构以时间序列来淘汰数据的策略： 通过一个独立的
     firstScore := scores[0]
 
     lastScore := scores[len(scores)-1]
-
     deletedCount, err := executiondao.DeleteExecutionList(stateMachineQRN, firstScore, lastScore)
 
     if err != nil \{

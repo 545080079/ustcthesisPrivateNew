@@ -16,29 +16,24 @@
 
 
 
-\subsection{技术方案分析}
-
-根据需求分析的结论，改进点主要有如下：
-\begin{enumerate}
-    \item 模板服务：提供工作流管理服务，增加应用模板功能。改进业务流程，缓存执行记录表
-    \item 调度器服务：提供执行任务时的容器调度，执行记录生成投递等功能。改进容器选择的策略，容器注册心跳检查等功能。
-    \item 鉴权服务：提供统一的权限检查。增加缓存层，缓存用户临时Token等数据。
-    \item 执行器服务：提供任务执行，容器管理，任务分发等功能，增加预测执行器功能。提供健康检查接口，供调度器可以实时获取每个执行器的信息。
-    \item 预测器服务：负责执行记录统计归档，生成任务预测值。
-\end{enumerate}
-
+%\subsection{技术方案分析}
+%
+%根据需求分析的结论，改进点主要有如下：
+%\begin{enumerate}
+%    \item 模板服务：提供工作流管理服务，增加应用模板功能。改进业务流程，缓存执行记录表
+%    \item 调度器服务：提供执行任务时的容器调度，执行记录生成投递等功能。改进容器选择的策略，容器注册心跳检查等功能。
+%    \item 鉴权服务：提供统一的权限检查。增加缓存层，缓存用户临时Token等数据。
+%    \item 执行器服务：提供任务执行，容器管理，任务分发等功能，增加预测执行器功能。提供健康检查接口，供调度器可以实时获取每个执行器的信息。
+%    \item 预测器服务：负责执行记录统计归档，生成任务预测值。
+%\end{enumerate}
+%根据这些微服务设计方案改进点，详细的设计与实现在本章节逐一具体展开。
 
 \subsection{模板微服务模块的设计与实现}
-
-
-
 \subsubsection{模块设计}
-
-
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.2\textwidth]{class-template.png}
+    \includegraphics[width=0.9\textwidth]{class-template.png}
     \caption{模板服务类图}
     \label{fig:模板服务类图}
 \end{figure}
@@ -57,7 +52,7 @@
 \begin{table}[H]
     \centering
     \caption{Template对象定义}
-    \label{tab:strcut-template}
+    \label{tab:struct-obj-template}
     \begin{tabular}{lll}
         \toprule
         字段 & 类型 & 描述 \\
@@ -269,8 +264,8 @@ DescribeApplicationTemplates：调用该接口以获取所有应用模板，通�
         & ResourceTemplateInput & string & 资源创建模板输入\\
         & PolicyDocument & string & 策略文档\\
         & TemplateDetailURL & string & 模板详情页URL\\
-        & RoleName & string & 角色名，格式：ASWAppRole-\{12位随机字符串\}\\
-        & PolicyName & string & 策略名，格式：ASWAppPolicy-\{12位随机字符串\}\\
+        & RoleName & string & 角色名，ASWRole-\{随机字符串\}\\
+        & PolicyName & string & 策略名，ASWPolicy-\{随机字符串\}\\
 
         \bottomrule
     \end{tabular}
@@ -402,7 +397,8 @@ step7 将flow的状态修改成RUNNING
 
 概率策略如下：
 
-（公式）对每个任务i p = (100-pi) / sum j∈[0,len), (100-pj)，
+对每个任务i， 有p = (100-pi) / sum
+%j=[0,len), (100-pj)，
 设4个执行器的负载为pa, pb, pc, pd，
 则对于执行器A来说，被选为目标的概率是(100-pa) / (100-pa) + (100-pb) + (100-pc) + (100-pd)，
 4个processor A，B，C，D的当前负载分别是 10，20，30，40，
@@ -439,9 +435,8 @@ StartExecution：调度器核心接口，负责执行一个工作流，该接口
         \toprule
         req, rsp   & 字段 & 类型 & 描述 \\
         \midrule
-%        req & TemplateId & string & 使用的模板ID\\
-%        & random-postfix & string & 随机编码,用于区分不同批次部署的资源\\ \hline
-%        rsp & ExecutionQRN & string & 这次执行的QRN\\
+        req & flowQrn & string & 工作流QRN\\
+        rsp & ExecutionQRN & string & 执行QRN\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -479,8 +474,8 @@ ProcessorPort参数进行尝试连接，成功后加入定时器心跳检查列�
             req & ProcessorHost & string & 执行器的HOST\\
             & ProcessorPort & string & 执行器的PORT\\
             & RegistrationType & int32 & 注册类型。0，注册；1，注销 \\ \hline
-            rsp & Code & string & 返回code。0为正常，非0有异常，具体信息在Msg\\
-            & Msg & string & 返回消息。code为0返回空字符串，非0，返回异常消息\\
+            rsp & Code & string & 返回code。0为正常，非0有异常\\
+            & Msg & string & 返回消息\\
             \bottomrule
         \end{tabular}
     \end{table}
@@ -512,7 +507,7 @@ CreateUserStatus：用户第一次使用该系统时，需要前端调用该接�
         req, rsp   & 字段 & 类型 & 描述 \\
         \midrule
         req & uid & string & 用户id\\ \hline
-        rsp & & & \\
+        rsp & result & bool & 创建结果\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -577,7 +572,7 @@ SecretId、SecretKey，其余字段为空。
     \centering
     \caption{执行数据写入方案对比}
     \label{tab:design_1}
-    \begin{tabular}{lp{12em}p{12em}l}
+    \begin{tabular}{lp{8em}p{8em}l}
         \toprule
         & MySQL方案   & Redis + 云日志CLS方案          & 仅云日志CLS \\
         \midrule
@@ -590,7 +585,7 @@ SecretId、SecretKey，其余字段为空。
         大量数据写入Redis
         & 低\\
         支持现有所有功能 & 支持 & 支持 & 支持\\
-        执行schema更新 & 支持 & 老数据无法更新 & 老数据无法更新\\
+        执行schema更新 & 支持 & 旧数据无法更新 & 旧数据无法更新\\
         成本 & 不变 & 包年付费 + 按量付费 & x\\
         技术扩展性 & 优秀，可使用Join语句 & 中等 & 中等\\
         容量扩展性 & 不可用 & 中等 & 优秀\\
@@ -676,7 +671,7 @@ Healthy：注册后的容器节点提供心跳检查的接口Healthy，调度器
     \end{figure}
 
     如图所示，预测器模块主要提供DAG输入输出预测，执行记录存储两大功能。预测器模块会将工作流的每次执行数据收集到数据库，预测器模块负责维护一个
-    通过收集到的历史数据构成的哈希表缓存。在每次请求预测执行的时候，会通过缓存来查找对应的记录值，如果成功，则返回预测的结果；否则，根据预测执行模式
+    通过收集到的历史数据构成的哈希表缓存\cite{jygjbp}。在每次请求预测执行的时候，会通过缓存来查找对应的记录值，如果成功，则返回预测的结果；否则，根据预测执行模式
     来选择从数据库数据找到该预测值，或是取消本次预测请求，这会使得执行器直接退化为顺序执行模式进行后续节点的执行。
 
 
@@ -768,7 +763,6 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
         f\_modify\_time   &timestamp & &否&&最近修改时间 \\
         f\_creator	&varchar	&64 &否&&创建者ID \\
         f\_modifier	&varchar	&64 &否&&修改者ID \\
-        f\_app\_id	&int	&18 &否&& \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -782,7 +776,7 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
         \toprule
         字段名	&类型	&长度	&可为Null &默认值	&描述 \\
         \midrule
-        f\_id	&int	&11 &否&& \\
+        f\_id	&int	&11 &否&& 主键ID\\
         f\_processor\_host	&varchar	&20 &否&& 执行器主机IP\\
         f\_processor\_port	&varchar	&20 &否&& 执行器端口\\
         f\_processor\_load	&int	&11 &否&& 执行器实时负载\\
@@ -804,20 +798,20 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
         \toprule
         字段名	&类型	&长度	&可为Null&默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &否& 主键ID\\
-        f\_service\_id	&varchar	&64 &否& 工作流ID\\
-        f\_machine\_qrn	&varchar	&128 &否& 工作流QRN\\
-        f\_role\_qrn	&varchar	&128 &否& 授权QRN\\
-        f\_template\_id	&varchar	&64 &否& 关联模板ID\\
-        f\_switch\_bit	&tinyint	&4 &否& 日志写入标志位\\
-        f\_service\_name	&varchar	&64 &否& 工作流名称\\
-        f\_machine\_type	&varchar	&64 &否& 工作流类型\\
-        f\_category	&varchar	&12 &否& 工作流类别\\
-        f\_status	&varchar	&64 &否& 工作流状态\\
-        f\_create\_time	&timestamp & &否& 创建时间\\
-        f\_modify\_time   &timestamp & &否& 最后一次修改时间\\
-        f\_creator	&varchar	&64 &否& 创建者ID\\
-        f\_modifier	&varchar	&64 &否& 修改者ID\\
+        f\_id	&bigint	&20 &否&& 主键ID\\
+        f\_service\_id	&varchar	&64 &否&& 工作流ID\\
+        f\_machine\_qrn	&varchar	&128 &否&& 工作流QRN\\
+        f\_role\_qrn	&varchar	&128 &否&& 授权QRN\\
+        f\_template\_id	&varchar	&64 &否&& 关联模板ID\\
+        f\_switch\_bit	&tinyint	&4 &否&& 日志写入标志位\\
+        f\_service\_name	&varchar	&64 &否&& 工作流名称\\
+        f\_machine\_type	&varchar	&64 &否&& 工作流类型\\
+        f\_category	&varchar	&12 &否&& 工作流类别\\
+        f\_status	&varchar	&64 &否&& 工作流状态\\
+        f\_create\_time	&timestamp & &否&& 创建时间\\
+        f\_modify\_time   &timestamp & &否&& 最后一次修改时间\\
+        f\_creator	&varchar	&64 &否&& 创建者ID\\
+        f\_modifier	&varchar	&64 &否&& 修改者ID\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -838,9 +832,9 @@ ExecutionRecord：将每次执行的任务输入输出对应起来并保存，�
         f\_execution\_name	&varchar	&128 &否 & &该次执行名称 \\
         f\_execution\_qrn	&varchar	&128 &否 & &该次执行QRN \\
         f\_execution\_definition	&text	& &否 & &工作流的模板TCSL定义 \\
-        f\_start\_time	&varchar	&20 &否 & &执行开始时间 \\
-        f\_end\_time	&varchar	&20 &否 & &执行结束时间 \\
-        f\_execution\_status	&varchar	&20 &否 & &当前执行状态\\
+        f\_start\_time	&varchar	&20 &否 & NOW()&执行开始时间 \\
+        f\_end\_time	&varchar	&20 &否 & NOW()&执行结束时间 \\
+        f\_execution\_status	&varchar	&20 &否 &0 &当前执行状态\\
         f\_input	&text	& &否 & &工作流的用户输入 \\
         f\_output	&text	& &否 & &工作流执行的输出 \\
         f\_processor\_id	&int	&11 &否 & &执行物理机器的id \\
@@ -858,17 +852,16 @@ template\_resource表t\_template\_execution：负责记录工作流应用模板�
         \toprule
         字段名	&类型	&长度	&可为Null&默认值	&描述 \\
         \midrule
-        f\_id	&bigint	&20 &否 & 主键id\\
-        f\_type	&varchar	&255 &否 & 资源类型\\
-        f\_template\_id	&varchar	&64 &否 & 模板id\\
-        f\_name	&varchar	&255 &否 & 应用模板名称\\
-        f\_description	&varchar	&255 &否 & 应用模板描述\\
-        f\_event\_node\_name	&varchar	&255 &否 & 在工作流中的节点名称\\
-        f\_service\_url	&varchar	&255 &否 & 外部服务的控制台地址\\
-        f\_describe\_status\_url	&varchar	&255 &否 & 查询外部服务的url\\
-        f\_status	&tinyint	&4 &否 & 可用状态，0， 1枚举值\\
+        f\_id	&bigint	&20 &否 && 主键id\\
+        f\_type	&varchar	&255 &否 && 资源类型\\
+        f\_template\_id	&varchar	&64 &否 && 模板id\\
+        f\_name	&varchar	&255 &否 && 应用模板名称\\
+        f\_description	&varchar	&255 &否 && 应用模板描述\\
+        f\_event\_node\_name	&varchar	&255 &否 && 工作流节点名称\\
+        f\_service\_url	&varchar	&255 &否 && 服务控制台地址\\
+        f\_status	&tinyint	&4 &否 && 可用状态\\
         f\_create\_time	&timestamp	& &否 &NOW() & 创建时间\\
-        f\_last\_update\_time	&timestamp	& &否 &NOW() & 最后一次更新时间\\
+        f\_last\_update\_time	&timestamp	& &否 &NOW() & 最后更新时间\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -887,10 +880,10 @@ t\_user表t\_user：负责记录用户鉴权信息
         f\_app\_id	&varchar	&128 &否 && 用户appId\\
         f\_status	&varchar	&20 &否 && 用户状态\\
         f\_create\_time	&datetime	& &否 &NOW()  & 创建时间\\
-        f\_last\_login\_time	&datetime	& &否 &NOW()  & 最后一次登录时间\\
+        f\_last\_login\_time	&datetime	& &否 &NOW()  & 最后登录时间\\
         f\_cls\_logset\_id	&varchar	&255 &否 && 日志集id\\
         f\_cls\_topic\_id	&varchar	&255 &否 && 日志主题id\\
-        f\_log\_bit	&tinyint	&4 &否 && 日志授权标志二进制位, 用户|系统日志集\\
+        f\_log\_bit	&tinyint	&4 &否 && 日志授权标志位\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -898,43 +891,41 @@ t\_user表t\_user：负责记录用户鉴权信息
 
 \section{缓存}
 由于每个模块承受处理的流量不一致，存在性能瓶颈模块。针对该部分需要设计基于缓存的存储方案，实现对服务高性能、可用性和稳定性的保障。
+使用Hash Set存储执行日志的元数据，使用Sorted Set存储最近的执行日志数据，通过将数据的不可变部分和可变部分分离，可以分别支持需要大量访问最近数据的
+场景和在内存中存储更多日志数据的场景，代价是操作逻辑复杂化。
 
-
-
-使用REDIS 的sorted set存储最近的N个Execution数据 (双写redis方案)
-
-插入:
-元数据O(1)：
-HSET E\_\{StateMachineQRN\}\_\{ExecutionQRN\} metadata $\{execution details\}, status $\{status\}, output $\{output\} StopDate $\{1238192837\}
-
-列表数据O(1)：
-ZADD Executions\_\{StateMachineQRN\} \$\{current\_timestamp\} \$\{name, status, start\_time, end\_time\}
-Execution对应的stateMachine信息 O(1)：
-set $\{ExecutionQRN\} $\{stateMachineQRN\}
-
-分页查询:
-查询zset数据O(logN + M): ZRANGE key start stop
-zcount查询总条数 ZCOUNT key min max
-
-单条查询O(1)：
-HGET  EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\}
-
-判断是否存在 O(1)：
-HEXISTS EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\}
-
-更新：
-HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
-采用LRU淘汰策略清理数据：
-
-获取待清理数据: ZRANGE key min max [LIMIT offset count]
-
-清理ZSet列表数据: ZREMRANGE key min max
-
-遍历找到的所有Key：
-
-使用HDEL删除元数据
-
-使用DEL删除Execution对应的stateMachine信息
+%插入:
+%元数据O(1)：
+%HSET E\_\{StateMachineQRN\}\_\{ExecutionQRN\} metadata $\{execution details\}, status $\{status\}, output $\{output\} StopDate $\{1238192837\}
+%
+%列表数据O(1)：
+%ZADD Executions\_\{StateMachineQRN\} \$\{current\_timestamp\} \$\{name, status, start\_time, end\_time\}
+%Execution对应的stateMachine信息 O(1)：
+%set $\{ExecutionQRN\} $\{stateMachineQRN\}
+%
+%分页查询:
+%查询zset数据O(logN + M): ZRANGE key start stop
+%zcount查询总条数 ZCOUNT key min max
+%
+%单条查询O(1)：
+%HGET  EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\}
+%
+%判断是否存在 O(1)：
+%HEXISTS EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\}
+%
+%更新：
+%HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
+%采用LRU淘汰策略清理数据：
+%
+%获取待清理数据: ZRANGE key min max [LIMIT offset count]
+%
+%清理ZSet列表数据: ZREMRANGE key min max
+%
+%遍历找到的所有Key：
+%
+%使用HDEL删除元数据
+%
+%使用DEL删除Execution对应的stateMachine信息
 
 
 
@@ -968,22 +959,20 @@ HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
         \end{tabular}
     \end{table}
 
-
-
     \begin{table}[H]
         \centering
         \caption{执行日志详情}
         \label{tab:key-log-hash}
-        \begin{tabular}{lp{8em}ll}
+        \begin{tabular}{lp{8em}lp{8em}}
             \toprule
-            对象   & 数据               & 说明 & Key格式 \\
+            对象   & 数据               & 说明\\
             \midrule
-            日志详细信息 & MachineQrn    & 机器QRN                      & E\_\$\{MachineQrn\}\_\$\{ExecutionQrn\}\\
-            (HashTable) & ExecutionQrn  & 执行QRN &\\
-            & Metadata      & 不可变数据部分（JSON）&\\
-            & Status        & 状态，需要频繁更新的字段 &\\
-            & Output        & 输出，需要频繁更新的字段 &\\
-            & EndTime       & 终止时间，需要频繁更新的字段 &\\
+            日志详细信息 & MachineQrn    & 机器QRN\\
+            (HashTable) & ExecutionQrn  & 执行QRN\\
+            & Metadata      & 不可变数据部分（JSON）\\
+            & Status        & 状态，需要频繁更新的字段\\
+            & Output        & 输出，需要频繁更新的字段\\
+            & EndTime       & 终止时间，需要频繁更新的字段\\
             \bottomrule
         \end{tabular}
     \end{table}
@@ -994,9 +983,9 @@ HSET EXECUTION\_\{MachineQRN\}\_\{ExecutionQRN\} data \{execution\_details\}
         \label{tab:key-log-index}
         \begin{tabular}{lp{10em}ll}
             \toprule
-            对象   & 数据               & 说明 & Key格式 \\
+            对象   & 数据               & 说明\\
             \midrule
-            ExecutionQrn索引 & ExecutionQrn    & 执行QRN    & E\_\$\{MachineQrn\} \\
+            ExecutionQrn索引 & ExecutionQrn    & 执行QRN\\
             (string) &&& \\
             \bottomrule
         \end{tabular}
