@@ -11,13 +11,15 @@
 
 \begin{abstract}
   本文介绍了一种应用与服务编排工作流（Application Service Workflow，以下简称ASW）的云服务系统。该系统为用户提供编排一个或多个云服务的能力，
-  将现有的云服务作为组件，根据用户提供的场景和需求，来创建工作流应用，为企业和个人提供应用上云的自动化编排能力。
-  系统将根据用户构建的工作流提供的资源描述信息，从而解析为一个有向无环图内存对象，交由执行引擎调度执行。
-  并且，系统基于低代码开发的设计理念，支持JSON以及图形化编排的混合开发模式\cite{othe4}，进一步降低用户门槛。
+  将现有的云服务作为组件，根据用户提供的场景和需求，来创建工作流应用，将多个独立的服务重新组合为一个整体，以允许用户在更加复杂的场景下使用云服务。
+
+  系统将根据用户构建的工作流提供的资源描述信息，将其解析为一个或多个可被执行的任务节点，再将节点组合成为一个有向无环图，交由执行引擎调度执行。
+  为了使系统使用门槛进一步降低，系统采用了基于低代码开发的设计理念，支持JSON以及图形化编排的混合开发模式\cite{othe4}，根据用户知识储备的不同，
+  用户可以自由选择使用哪一种开发方式。
 
   目前由于业务高速扩展，系统需要保证在数据量不断攀升的情况下，仍能较好地保证系统的可用性。
   因而，对系统的可用性、一致性提出了较高的要求，本文针对这些方面，对方案的可行性作出了探讨，提出了一种以当下最为灵活的微服务架构模式进行系统功能模块
-  的划分的方式的设计方案。本文通过对系统瓶颈环节进行需求分析，有针对性地吸取其它同类系统的经验，提出了更优化的系统设计\cite{othe3}，
+  划分的设计方案。本文通过对系统瓶颈环节进行需求分析，有针对性地吸取其它同类系统的经验，提出了更优化的系统设计\cite{othe3}，
   包括加入可视化编排、模板部署和快速执行等能力，以适应目前同类产品所欠缺的能力，设计目的是构建一个满足高性能、高可用、高可扩展性的分布式系统。
 
 
@@ -26,19 +28,21 @@
 \begin{abstract*}
   This dissertation introduces a cloud service system for Application Service Workflow (ASW).
   The system provides users with the ability to orchestrate one or more cloud services,
-  using existing cloud services as components to create workflow applications based on user-provided scenarios and needs
-  to provide enterprises and individuals with automated orchestration capabilities for applications to the cloud.
-  The system will parse the resource description provided by the user-built workflow into a directed
-  acyclic graph memory object, which will be dispatched and executed by the execution engine.
-  In addition, the system is based on the design concept of low-code development,
-  supports JSON and graphical orchestration hybrid development mode\cite{othe4}, further lowering the user threshold.
+  using existing cloud services as components to create workflow applications based on user-provided scenarios and needs,
+  and recombine multiple independent services into a whole to allow users to use cloud services in more complex scenarios.
+  The system will parse the resource description information provided by the user-built workflow into one or more task
+  nodes that can be executed, and then combine the nodes into a directed acyclic graph,
+  which will be dispatched and executed by the execution engine.
+  In order to further reduce the threshold for the use of the system, the system adopts a design concept based on
+  low-code development, supports JSON and a mixed development model of graphical orchestration \cite{othe4},
+  according to different user knowledge reserves, The user can freely choose which development method to use.
 
   At present, due to the rapid expansion of business, the system needs to ensure that the availability of the system can
   still be better guaranteed even when the amount of data continues to rise.
   Therefore, higher requirements are put forward for the availability and consistency of the system.
   This dissertation discusses the feasibility of the scheme in view of these aspects,
-  and proposes a system function module based on the most flexible micro-service architecture mode at the moment.
-  The design scheme of the way of division.
+  and proposes a system function module based on the most flexible microservice architecture model at the moment
+  Design scheme of division.
   In this dissertation, through a demand analysis of the bottleneck links of the system, it specifically draws on the experience
   of other similar systems, and proposes a more optimized system design \cite{othe3},
   including the addition of visual orchestration, template deployment, and rapid execution capabilities to adapt to the

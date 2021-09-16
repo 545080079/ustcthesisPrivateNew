@@ -99,8 +99,8 @@
 
 \subsubsection{接口设计}
 
-模板服务的路由前缀/v1/template/所包含的接口如下：
-CreateTemplate
+CreateTemplate：创建模板
+
 \begin{table}[H]
     \centering
     \caption{创建模板}
@@ -115,7 +115,8 @@ CreateTemplate
     \end{tabular}
 \end{table}
 
-ModifyTemplate
+ModifyTemplate：修改指定模板
+
 \begin{table}[H]
     \centering
     \caption{更新模板}
@@ -130,7 +131,9 @@ ModifyTemplate
     \end{tabular}
 \end{table}
 
-DeleteTemplate
+DeleteTemplate：删除指定模板
+
+
 \begin{table}[H]
     \centering
     \caption{删除模板}
@@ -146,7 +149,8 @@ DeleteTemplate
     \end{tabular}
 \end{table}
 
-CreateFlowService
+CreateFlowService：创建工作流
+
 \begin{table}[H]
     \centering
     \caption{创建工作流}
@@ -162,7 +166,8 @@ CreateFlowService
     \end{tabular}
 \end{table}
 
-ModifyFlowService
+ModifyFlowService：修改工作流
+
 \begin{table}[H]
     \centering
     \caption{更新工作流}
@@ -179,7 +184,8 @@ ModifyFlowService
 \end{table}
 
 
-DeleteFlowService
+DeleteFlowService：删除指定工作流
+
 \begin{table}[H]
     \centering
     \caption{删除工作流}
@@ -195,7 +201,9 @@ DeleteFlowService
         \bottomrule
     \end{tabular}
 \end{table}
-DescribeFlowServices
+
+DescribeFlowServices：获取工作流列表
+
 \begin{table}[H]
     \centering
     \caption{获取用户名下所有工作流}
@@ -211,7 +219,8 @@ DescribeFlowServices
     \end{tabular}
 \end{table}
 
-DescribeFlowServiceDetail
+DescribeFlowServiceDetail：获取指定工作流详情
+
 \begin{table}[H]
     \centering
     \caption{获取指定工作流的详情}
@@ -338,11 +347,9 @@ DescribeDeployResults：获取根据应用模板创建工作流的结果，可�
 
 该模块设计的目的是保证系统的可扩展性和可维护性。 通过抽象业务场景，以支持较好的可扩展性；保障系统可用性，提高系统的可维护性。
 
-调度器服务的核心能力是将不同类型的用户请求发给合适的执行器。 在这个过程中，调度器应该要肩负这两个重任：
-1.抽象任务类型，让系统可以支持更多类型的场景。要支持多种类型的任务，需要做较高层次的抽象，处理数据异构
-2.保障系统可用性。要覆盖所有异常情况
+调度器服务的核心能力是将不同类型的用户请求发给合适的执行器。 在这个过程中，调度器应该要承担抽象任务类型的责任，让系统可以支持更多类型的场景，
+支持多种类型的任务，需要做较高层次的抽象。
 
-2）命令提交
 
 \begin{figure}[H]
     \centering
@@ -351,9 +358,7 @@ DescribeDeployResults：获取根据应用模板创建工作流的结果，可�
     \label{fig:调度器流程}
 \end{figure}
 
-命令提交是调度器的核心流程，
-
-service层收到请求，进行入参检查，然后调用receiveCmdService处理接收请求逻辑；
+如上图所示，命令提交是调度器的核心流程，service层收到请求，进行入参检查，然后调用receiveCmdService处理接收请求逻辑；
 receiveCmdService会判断当前系统task的数量，生成执行id，然后启动一个协程来异步提交命令；
 doSubmitService 会进行命令的解析，看是哪种命令，来做数据的处理和准备，然后进行命令分发，有分发四种命令，通过相应的逻辑，判断应该用哪种路由，
 调用指定的路由方法，调用 callProcessor 打给指定的执行器
@@ -405,11 +410,8 @@ step7 将flow的状态修改成RUNNING
 则这100个task，打给A的概率是（100-10）/（100-10）+（100-20）+（100-30）+（100-40），
 得到概率后，由随机数来决定最终目标。
 
-3）异常流检查和处理
-
-用于处理异常流程的，主要是两个定时器，healthyTimer 和 restartTimer
-healthyTimer 用于对容器实例的健康检查
-restartTimer 用于对所有非正常任务进行重启
+处理异常的方式主要依靠两个定时器，healthyTimer 和 restartTimer，
+前者用于对容器实例的健康检查，后者用于对所有非正常任务进行重启
 
 timer 用于定时，timer 到了指定时间会启动 timer 对应的 timerTask。timerTask 执行指定的逻辑。
 这些逻辑都是保护逻辑，保护逻辑是不需要所有调度器实例都去执行\cite{jyfw}。
